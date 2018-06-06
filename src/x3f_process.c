@@ -31,8 +31,10 @@ static int sum_area(x3f_area16_t area, int colors,
 
   for (row = 0; row < area.rows; row++)
     for (col = 0; col < area.columns; col++)
-      for (color = 0; color < colors; color++)
+      for (color = 0; color < colors; color++) {
+  x3f_printf(DEBUG, "%ld, %ld, %x, %ld, %d \n", area.row_stride, row, area.channels, col, color );
         sum[color] += (uint64_t)area.data[ area.row_stride*row + area.channels*col + color];
+      }
 
   return area.columns*area.rows;
 }
@@ -121,8 +123,11 @@ static int get_black_level(x3f_t *x3f,
 
   for (i=0; i<4; i++)
     if (use[i]) {
+  x3f_printf(DEBUG, "use[%d]\n", i);
       int color;
       int pixels = sum_area(area[i], colors, black);
+
+  x3f_printf(DEBUG, "pass sum_area \n");
 
       pixels_sum += pixels;
 
@@ -134,7 +139,11 @@ static int get_black_level(x3f_t *x3f,
       }
     }
 
+  x3f_printf(DEBUG, "1\n");
+
   if (pixels_sum == 0) return 0;
+
+  x3f_printf(DEBUG, "2\n");
 
   for (i=0; i<colors; i++)
     black_level[i] = (double)black_sum[i]/pixels_sum;
@@ -143,6 +152,8 @@ static int get_black_level(x3f_t *x3f,
   black_sqdev = alloca(colors*sizeof(double));
   black_sqdev_sum = alloca(colors*sizeof(double));
   for (i=0; i<colors; i++) black_sqdev_sum[i] = 0.0;
+
+  x3f_printf(DEBUG, "3\n");
 
   for (i=0; i<4; i++)
     if (use[i]) {
